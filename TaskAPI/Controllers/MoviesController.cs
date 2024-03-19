@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data.Entity;
+using System.IO;
+using System.Linq;
 using TaskAPI.Context;
 using TaskAPI.Entities;
 using TaskAPI.Models;
@@ -18,7 +21,8 @@ namespace TaskAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            return Ok(_appDbContext.Movies);
+            // include
+            return Ok(_appDbContext.Movies.Include(m => m.Categories).Include(m => m.Directors).Include(m => m.Actors));
         }
 
         [HttpGet("{id}")]
@@ -56,16 +60,22 @@ namespace TaskAPI.Controllers
         [HttpPost]
         public void Post(MovieAddDTO newMovie)
         {
+            List<Category> categories = _appDbContext.Categories.Where(c => newMovie.CategoryIds.Contains(c.Id)).ToList();
+            List<Director> directors = _appDbContext.Directors.Where(d => newMovie.DirectorIds.Contains(d.Id)).ToList(); ;
+            List<Actor> actors = _appDbContext.Actors.Where(a => newMovie.ActorIds.Contains(a.Id)).ToList(); ;
+
             Movie movie = new()
             {
                 Name = newMovie.Name,
                 Description = newMovie.Description,
+                CoverUrl = newMovie.CoverUrl,
+                TrailerUrl = newMovie.TrailerUrl,
                 Year = newMovie.Year,
                 Language = newMovie.Language,
                 ImdbPoint = newMovie.ImdbPoint,
-                Categories = newMovie.Categories,
-                Directors = newMovie.Directors,
-                Actors = newMovie.Actors
+                Categories = categories,
+                Directors = directors,
+                Actors = actors
             };
             _appDbContext.Movies.Add(movie);
             _appDbContext.SaveChanges();
@@ -76,6 +86,9 @@ namespace TaskAPI.Controllers
         {
             Movie updateaMovie = _appDbContext.Movies.Find(id);
             updateaMovie.Name = movie.Name;
+            updateaMovie.Description = movie.Description;
+            updateaMovie.CoverUrl = movie.CoverUrl;
+            updateaMovie.TrailerUrl = movie.TrailerUrl;
             updateaMovie.Description = movie.Description;
             updateaMovie.Language = movie.Language;
             updateaMovie.Year = movie.Year;
