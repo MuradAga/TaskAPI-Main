@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using TaskAPI.Entiities;
 using TaskAPI.Entities;
 
 namespace TaskAPI.Context
@@ -14,5 +13,7 @@ namespace TaskAPI.Context
         public DbSet<Director> Directors { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Movie> Movies { get; set; }
+        public DbSet<List> Lists { get; set; }
+        public DbSet<Message> Messages { get; set; }
     }
 }

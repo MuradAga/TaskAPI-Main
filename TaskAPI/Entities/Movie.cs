@@ -11,8 +11,10 @@
         public bool Language { get; set; }
         public uint Views { get; set; } = 0;
         public float ImdbPoint { get; set; }
+        public DateTime CreatedAt { get; set; } = DateTime.Now;
         public List<Category> Categories { get; set; }
         public List<Director> Directors { get; set; }
         public List<Actor> Actors { get; set; }
+        public List<List> Lists { get; set; }
     }
 }

@@ -2,7 +2,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using TaskAPI.Context;
-using TaskAPI.Entiities;
+using TaskAPI.Entities;
 using TaskAPI.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860

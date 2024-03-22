@@ -18,6 +18,7 @@ namespace TaskAPI.Controllers
         {
             _appDbContext = appDbContext; // dependency injection object
         }
+
         [HttpGet]
         public IActionResult Get()
         {
@@ -54,6 +55,13 @@ namespace TaskAPI.Controllers
         public IActionResult GetMoviesByFilter(int categoryId, ushort year, int imdbPoint)
         {
             var movies = _appDbContext.Movies.Where(movie => movie.Categories.FirstOrDefault(c => c.Id == categoryId) != null && movie.Year == year && movie.ImdbPoint >= imdbPoint);
+            return Ok(movies);
+        }
+
+        [HttpGet("getMostViewedFilms")]
+        public IActionResult GetMostViewedFilms()
+        {
+            var movies = _appDbContext.Movies.OrderByDescending(movie => movie.Views);
             return Ok(movies);
         }
 

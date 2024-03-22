@@ -1,4 +1,4 @@
-﻿namespace TaskAPI.Entiities
+﻿namespace TaskAPI.Entities
 {
     public class User
     {

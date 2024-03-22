@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TaskAPI.Context;
-using TaskAPI.Entiities;
 using TaskAPI.Entities;
 using TaskAPI.Models;
 
@@ -17,6 +16,7 @@ namespace TaskAPI.Controllers
         {
             _appDbContext = appDbContext; // dependency injection object
         }
+
         [HttpGet]
         public IActionResult Get()
         {
