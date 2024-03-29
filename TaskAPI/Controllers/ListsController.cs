@@ -15,13 +15,14 @@ namespace TaskAPI.Controllers
         {
             _appDbContext = appDbContext; // dependency injection object
         }
+
         [HttpGet]
         public IActionResult Get()
         {
             return Ok(_appDbContext.Lists.ToList());
         }
 
-        [HttpGet]
+        [HttpGet("getOrderByLists")]
         public IActionResult GetOrderByLists()
         {
             var lists = _appDbContext.Lists.OrderByDescending(list => list.CreatedAt);

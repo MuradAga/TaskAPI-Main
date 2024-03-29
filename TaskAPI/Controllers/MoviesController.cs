@@ -22,8 +22,16 @@ namespace TaskAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            // include
-            return Ok(_appDbContext.Movies.Include(m => m.Categories).Include(m => m.Directors).Include(m => m.Actors));
+            var movies = _appDbContext.Movies.ToList();
+
+            foreach (var movie in movies)
+            {
+                movie.Directors = _appDbContext.Directors.Where(d => d.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
+                movie.Actors = _appDbContext.Actors.Where(a => a.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
+                movie.Categories = _appDbContext.Categories.Where(c => c.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
+            }
+
+            return Ok(movies);
         }
 
         [HttpGet("{id}")]
