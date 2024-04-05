@@ -22,7 +22,7 @@ namespace TaskAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            var movies = _appDbContext.Movies.ToList();
+            var movies = _appDbContext.Movies.ToList().OrderByDescending(movie => movie.CreatedAt);
 
             foreach (var movie in movies)
             {
@@ -31,6 +31,14 @@ namespace TaskAPI.Controllers
                 movie.Categories = _appDbContext.Categories.Where(c => c.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
             }
 
+            return Ok(movies);
+        }
+        [HttpGet("getTrendMovies")] 
+        public IActionResult GetTrendMovies()
+        {
+            int year = DateTime.Now.Year;
+            int month = DateTime.Now.Month;
+            var movies = _appDbContext.Movies.ToList().Where(movie => movie.CreatedAt.Year > year - 1 && movie.CreatedAt.Year < year && movie.CreatedAt.Month>month-1 && movie.CreatedAt.Month < month).OrderByDescending(movie => movie.Views).Take(4);
             return Ok(movies);
         }
 
