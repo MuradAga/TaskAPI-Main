@@ -33,12 +33,13 @@ namespace TaskAPI.Controllers
 
             return Ok(movies);
         }
+
         [HttpGet("getTrendMovies")] 
         public IActionResult GetTrendMovies()
         {
             int year = DateTime.Now.Year;
             int month = DateTime.Now.Month;
-            var movies = _appDbContext.Movies.ToList().Where(movie => movie.CreatedAt.Year > year - 1 && movie.CreatedAt.Year < year && movie.CreatedAt.Month>month-1 && movie.CreatedAt.Month < month).OrderByDescending(movie => movie.Views).Take(4);
+            var movies = _appDbContext.Movies.Where(movie => ((year - movie.CreatedAt.Year) * 12) + month - movie.CreatedAt.Month <= 1).OrderByDescending(movie => movie.Views).Take(4);
             return Ok(movies);
         }
 
@@ -83,10 +84,10 @@ namespace TaskAPI.Controllers
 
         [HttpPost]
         public void Post(MovieAddDTO newMovie)
-        {
+        {   
             List<Category> categories = _appDbContext.Categories.Where(c => newMovie.CategoryIds.Contains(c.Id)).ToList();
             List<Director> directors = _appDbContext.Directors.Where(d => newMovie.DirectorIds.Contains(d.Id)).ToList(); ;
-            List<Actor> actors = _appDbContext.Actors.Where(a => newMovie.ActorIds.Contains(a.Id)).ToList(); ;
+            List<Actor> actors = _appDbContext.Actors.Where(a => newMovie.ActorIds.Contains(a.Id)).ToList();
 
             Movie movie = new()
             {
