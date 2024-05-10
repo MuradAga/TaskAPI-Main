@@ -71,7 +71,15 @@ namespace TaskAPI.Controllers
         [HttpGet("getMoviesByFilter")]
         public IActionResult GetMoviesByFilter(int categoryId, ushort year, int imdbPoint)
         {
-            var movies = _appDbContext.Movies.Where(movie => movie.Categories.FirstOrDefault(c => c.Id == categoryId) != null && movie.Year == year && movie.ImdbPoint >= imdbPoint);
+            var movies = _appDbContext.Movies.Where(movie => movie.Categories.FirstOrDefault(c => c.Id == categoryId) != null && movie.Year == year && movie.ImdbPoint >= imdbPoint).ToList();
+            
+            foreach (var movie in movies)
+            {
+                movie.Directors = _appDbContext.Directors.Where(d => d.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
+                movie.Actors = _appDbContext.Actors.Where(a => a.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
+                movie.Categories = _appDbContext.Categories.Where(c => c.Movies.FirstOrDefault(m => m.Id == movie.Id) != null).ToList();
+            }
+
             return Ok(movies);
         }
 

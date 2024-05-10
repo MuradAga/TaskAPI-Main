@@ -15,5 +15,6 @@ namespace TaskAPI.Context
         public DbSet<Movie> Movies { get; set; }
         public DbSet<List> Lists { get; set; }
         public DbSet<Message> Messages { get; set; }
+        public DbSet<UserEmailCode> UserEmailCodes { get; set; }
     }
 }

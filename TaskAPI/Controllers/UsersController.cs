@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MailKit.Net.Smtp;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using MimeKit;
 using System.Security.Cryptography;
 using System.Text;
 using TaskAPI.Context;
@@ -63,7 +66,14 @@ namespace TaskAPI.Controllers
         [HttpPost("register")]
         public IActionResult Register(UserRegisterModel user)
         {
-            if (user.Password == user.RepeatPassword)
+            bool verificationCodeIsTrue = false;
+            string verificationCode = _appDbContext.UserEmailCodes.OrderBy(u => u.Id).Last(userEmailCode => userEmailCode.Email == user.PhoneOrEmail).Code;
+
+            if (user.Code == verificationCode)
+                verificationCodeIsTrue = true;
+
+            User user2 = _appDbContext.Users.FirstOrDefault(u => u.Username == user.Username);
+            if (user2 == null && verificationCodeIsTrue)
             {
                 try
                 {
@@ -78,19 +88,58 @@ namespace TaskAPI.Controllers
                         builder.Append(bytes[i].ToString("x2"));
                     }
 
-                    User newUser = new() { Username = user.Username, Password = builder.ToString() };
+                    User newUser = new() { FullName = user.FullName, PhoneOrEmail = user.PhoneOrEmail, Username = user.Username, Password = builder.ToString() };
                     _appDbContext.Users.Add(newUser);
                     _appDbContext.SaveChanges();
                 }
                 catch (Exception)
                 {
-                    return BadRequest();
+                    return BadRequest("An error occurred");
                 }
 
+                _appDbContext.UserEmailCodes.RemoveRange(_appDbContext.UserEmailCodes.Where(u => u.Email == user.PhoneOrEmail));
+                _appDbContext.SaveChanges();
+                return Ok();
+            }
+            else if (!verificationCodeIsTrue)
+            {
+                return BadRequest("Verification code is false");
             }
             else
             {
+                return BadRequest("Username has been used");
             }
+        }
+
+        [HttpPost("sendCodeToEmail")]
+        public IActionResult SendCodeToEmail(string email)
+        {
+            string code = new Random().Next(1000, 10000).ToString();
+            string subjectText = "Instagram2 Register";
+            string bodyText = @$"Verification code: <h1 style='color: red;'>{code}</h1>";
+
+            MimeMessage mimeMessage = new MimeMessage();
+
+            MailboxAddress mailboxAddressFrom = new MailboxAddress("Register", email);
+            mimeMessage.From.Add(mailboxAddressFrom);
+
+            MailboxAddress mailboxAddressTo = new MailboxAddress("User", email);
+            mimeMessage.To.Add(mailboxAddressTo);
+
+            var bodyBuilder = new BodyBuilder();
+            bodyBuilder.HtmlBody = bodyText;
+            mimeMessage.Body = bodyBuilder.ToMessageBody();
+            mimeMessage.Subject = subjectText;
+
+            SmtpClient client = new SmtpClient();
+            client.Connect("smtp.gmail.com", 587, false);
+            client.Authenticate("petopiaanimal@gmail.com", "ldfcaeeotzoqzgih");
+            client.Send(mimeMessage);
+            client.Disconnect(true);
+
+            _appDbContext.UserEmailCodes.Add(new UserEmailCode() { Email = email, Code = code });
+            _appDbContext.SaveChanges();
+
             return Ok();
         }
 
@@ -134,6 +183,48 @@ namespace TaskAPI.Controllers
             }
         }
 
+        [HttpPatch("forgotPassword")]
+        public IActionResult ForgotPassword(UserForgotPasswordRequestModel model)
+        {
+            if (model.NewPassword == model.RepeatNewPassword)
+            {
+                bool verificationCodeIsTrue = false;
+                string verificationCode = _appDbContext.UserEmailCodes.OrderBy(u => u.Id).Last(userEmailCode => userEmailCode.Email == model.Email).Code;
+
+                if (model.VerificationCode == verificationCode)
+                    verificationCodeIsTrue = true;
+
+                if (verificationCodeIsTrue)
+                {
+                    SHA256 sha256Hash = SHA256.Create();
+                    // ComputeHash - returns byte array
+                    byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(model.NewPassword));
+
+                    // Convert byte array to a string
+                    StringBuilder builder = new StringBuilder();
+                    for (int i = 0; i < bytes.Length; i++)
+                    {
+                        builder.Append(bytes[i].ToString("x2"));
+                    }
+
+                    User user = _appDbContext.Users.FirstOrDefault(user => user.PhoneOrEmail == model.Email);
+                    user.Password = builder.ToString();
+
+                    _appDbContext.UserEmailCodes.RemoveRange(_appDbContext.UserEmailCodes.Where(u => u.Email == user.PhoneOrEmail));
+                    _appDbContext.SaveChanges();
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Verification code is false");
+                }
+            }
+            else
+            {
+                return BadRequest("Passwords is not equal");
+            }
+        }
+
         [HttpDelete("{id}")]
         public void Delete(int id)
         {
@@ -143,16 +234,14 @@ namespace TaskAPI.Controllers
         }
 
         [HttpGet("login")]
-        public bool Login(string username, string password)
+        public IActionResult Login(string username, string password)
         {
-            User user = GetByUsernameAndPassword(username, password);
+            User user = GetByUsernameAndPassword(username, password); // null
 
-            if (user != null)
-            {
-                return true;
-            }
+            if (user == null)
+                return NotFound();
 
-            return false;
+            return Ok(user);
         }
     }
 }
