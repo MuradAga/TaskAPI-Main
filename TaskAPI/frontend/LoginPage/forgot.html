@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower|Overpass+Mono" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Forgot</title>
+</head>
+<body>
+
+<div id="wrapper">
+  <div class="main-content">
+    <div class="header">
+      <img src="instalogo.png" />
+      <p style="color: rgb(115, 115, 115); text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;;">Reset password</p>
+    </div>
+    <div class="l-part">
+        <input type="text" id="phone" placeholder="Mobile Number or Email" class="input-1" /> <button onclick="sendCodeToEmail()" style="position: absolute; right: 10px; top: 10px;">Send</button>
+        <div class="overlap-text">
+            <input type="password" id="pass1" placeholder="Password" class="input-2" />
+          </div><div class="overlap-text">
+        <input type="password" id="pass2" placeholder="Repeat Password" class="input-2" />
+      </div>
+      <input type="text" id="code" placeholder="Verification code" class="input-1" />
+      <button onclick="resetPassword()" class="btn">Reset</button>
+
+      <p id="response" style="color: red; font-size: 20px; font-family: sans-serif; display: none; margin-top: 30px;"></p>
+    </div>
+  </div>
+  <div class="sub-content">
+    <div class="s-part">
+        Have an account? <a href="login.html">Log in</a>
+    </div>
+  </div>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>

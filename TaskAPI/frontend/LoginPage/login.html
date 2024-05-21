@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css?family=Indie+Flower|Overpass+Mono" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>Login</title>
+</head>
+<body>
+
+<div id="wrapper">
+  <div class="main-content">
+    <div class="header">
+      <img src="instalogo.png" />
+    </div>
+    <div class="l-part">
+      <input type="text" id="username" placeholder="Username" class="input-1" />
+      <div class="overlap-text">
+        <input type="password" id="pass" placeholder="Password" class="input-2" />
+        <a href="forgot.html">Forgot?</a>
+      </div>
+<button onclick="login()" class="btn">Log in</button>
+      <p id="error">Sorry, your password was incorrect. Please double-check your password.</p>
+      <p id="result">Logged</p>
+    </div>
+  </div>
+  <div class="sub-content">
+    <div class="s-part">
+      Don't have an account? <a href="register.html">Sign up</a>
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
